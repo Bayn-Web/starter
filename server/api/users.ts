@@ -1,10 +1,8 @@
-export default defineEventHandler((event) => {
-    const params = getQuery(event)
-    const f: any[] = [];
-    for (let i = 0; i < (params.times as number); i++) {
-        f.push('user' + i);
-    }
+import { getAllUser } from "~/mysql/actions/getAll";
+export default defineEventHandler(async (event) => {
+    // const params = getQuery(event)
+    const data = await getAllUser()
     return {
-        list: f
+        list: data[0]
     }
 })
