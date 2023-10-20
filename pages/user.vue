@@ -1,36 +1,42 @@
 <template>
     <div>
-        <h1 class="cursor-pointer">About page</h1>
+        <h1 class="cursor-pointer">User page</h1>
         <NuxtLink to="/">Home page</NuxtLink>
-        <a-list v-for="item in userList.list">
-            <a-list-item>
-                <a-list-item-meta :description="item.name">
-                    <template #title>
-                        <a>{{ item }}</a>
-                    </template>
-                    <template #avatar>
-                        <a-avatar src="https://joeschmoe.io/api/v1/random" />
-                    </template>
-                </a-list-item-meta></a-list-item>
+        <a-button :loading="loading" @click="doExecute()">refresh</a-button>
+        <a-list :data-source="data.list">
+            <template #renderItem="{ item }">
+                <a-list-item>
+                    <a-list-item-meta :description="item.name">
+                        <template #title>
+                            <NuxtLink :to="'/userPage/'+item.id">{{ item.name }}</NuxtLink>
+                        </template>
+                        <template #avatar>
+                            <a-avatar src="/pic/th.jpg" />
+                        </template>
+                    </a-list-item-meta>
+                </a-list-item>
+            </template>
         </a-list>
-        <a-button @click="query(times++)" danger>123</a-button>
+        <img class="h-9 w-9 rounded object-cover" :src="pic">
     </div>
 </template>
 
 <script lang="ts" setup>
-const userList = reactive<{ list: any[] }>({ list: [] })
-const times = useState<number>("count", () => 0)
-const query = async (times: number) => {
-    $fetch<{ list: any[] }>('/api/users', {
-        method: "get",
-        params: {
-            times: times
-        }
-    }).then(res => {
-        userList.list = res.list
-    })
-}
-query(times.value);
-</script>
+import pic from "/pic/th.jpg"
 
-<style scoped></style>
+const loading = ref(false)
+
+const { data, execute } = await useLazyFetch<{ list: any[] }>(
+    '/api/users',
+    {
+        method: "post",
+        default: () => { return { list: [] } }
+    }
+)
+
+const doExecute = async () => {
+    loading.value = true
+    await execute();
+    loading.value = false
+}
+</script>

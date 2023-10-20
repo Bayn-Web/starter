@@ -1,6 +1,10 @@
 import { getconnection } from "~/mysql/settings";
 
-export const getAllUser = async () => {
+const makeConnect = async (sql: string, params?: any[]) => {
     const connection = await getconnection
-    return connection.execute('SELECT * FROM `user`');
+    return connection.execute(sql, params);
 }
+
+export const getAllUser = () => makeConnect('SELECT * FROM user', [])
+
+export const getOneUser = (id: number) => makeConnect("SELECT * FROM user where id=?", [id])
